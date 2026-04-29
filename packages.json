@@ -1,8 +1,8 @@
 {
-  "$schema": "https://go.kicad.org/pcm/schemas/v1",
+  "$schema": "https://go.kicad.org/pcm/schemas/v2",
   "packages": [
     {
-      "$schema": "https://go.kicad.org/pcm/schemas/v1",
+      "$schema": "https://go.kicad.org/pcm/schemas/v2",
       "name": "Via Stitching",
       "description": "Place stitching vias in patterns: grid, staggered/hex, perimeter along Edge.Cuts, or along selected tracks.",
       "description_full": "Adds an Action Plugin for pcbnew that fills selected copper zones (or stitches along the board edge or selected tracks) with vias on a configurable pitch. Supports rectangular grids, hexagonal/staggered packing, perimeter (Edge.Cuts) stitching, and along-track stitching. Respects clearance to other-net copper and inherits the selected zone's net by default. Newly placed vias are wrapped in a PCB_GROUP for easy bulk select / delete.",
@@ -23,11 +23,11 @@
           "version": "0.1.0",
           "status": "development",
           "kicad_version": "9.0",
-          "kicad_version_max": "10.0",
+          "runtime": "swig",
           "download_url": "https://raw.githubusercontent.com/Wadam100/via-stitching/main/releases/via_stitching-0.1.0.zip",
-          "download_sha256": "31f6af371a3a93f51566ecd2e799553b3d4582da0d29ba035dc505b5035de16a",
-          "download_size": 10143,
-          "install_size": 32748
+          "download_sha256": "fd620ece4e40601c4ade08e51a4cf0000766491d4494c42e81adcc30bb985361",
+          "download_size": 10144,
+          "install_size": 32738
         }
       ],
       "tags": [

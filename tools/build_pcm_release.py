@@ -152,7 +152,7 @@ def build_packages_json(metadata: dict, version: str, zip_path: Path, base_url: 
     pkg["versions"] = new_versions
 
     return {
-        "$schema": "https://go.kicad.org/pcm/schemas/v1",
+        "$schema": "https://go.kicad.org/pcm/schemas/v2",
         "packages": [pkg],
     }
 
@@ -160,8 +160,11 @@ def build_packages_json(metadata: dict, version: str, zip_path: Path, base_url: 
 def build_repository_json(packages_json_path: Path, base_url: str, maintainer: dict) -> dict:
     pkg_bytes = packages_json_path.read_bytes()
     when_str, when_ts = utc_now()
+    # schema_version: 2 tells KiCad 10's PCM client to use the v2 validator.
+    # Without it, KiCad 10 hangs in "Fetching repository" instead of erroring.
     return {
-        "$schema": "https://go.kicad.org/pcm/schemas/v1",
+        "$schema": "https://go.kicad.org/pcm/schemas/v2",
+        "schema_version": 2,
         "maintainer": maintainer,
         "name": "Via Stitching repository",
         "packages": {
