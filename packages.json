@@ -25,7 +25,7 @@
           "kicad_version": "9.0",
           "kicad_version_max": "10.0",
           "download_url": "https://raw.githubusercontent.com/Wadam100/via-stitching/main/releases/via_stitching-0.1.0.zip",
-          "download_sha256": "88724974e6d8f634d81978f516cafcd188771df05593bb9c1401114d955c537a",
+          "download_sha256": "31f6af371a3a93f51566ecd2e799553b3d4582da0d29ba035dc505b5035de16a",
           "download_size": 10143,
           "install_size": 32748
         }
