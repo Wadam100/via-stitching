@@ -206,10 +206,14 @@ def main() -> int:
 
     # packages.json (only writes the latest version's download_* hashes —
     # if you need to retain older versions in the repo, re-run for each.)
+    # Always write LF newlines: Git serves the LF-normalized blob from
+    # raw.githubusercontent.com, so the sha256 we record in repository.json
+    # has to be computed against LF bytes — not the CRLF that Path.write_text
+    # would produce on Windows.
     pkg_json = build_packages_json(metadata, versions[-1]["version"],
                                    last_zip, args.base_url)
     packages_path = repo_root / "packages.json"
-    packages_path.write_text(json.dumps(pkg_json, indent=2) + "\n")
+    packages_path.write_bytes((json.dumps(pkg_json, indent=2) + "\n").encode("utf-8"))
     print(f"  wrote {packages_path.relative_to(repo_root)}")
 
     # repository.json
@@ -219,7 +223,7 @@ def main() -> int:
     }
     repo_json = build_repository_json(packages_path, args.base_url, maintainer)
     repo_path = repo_root / "repository.json"
-    repo_path.write_text(json.dumps(repo_json, indent=2) + "\n")
+    repo_path.write_bytes((json.dumps(repo_json, indent=2) + "\n").encode("utf-8"))
     print(f"  wrote {repo_path.relative_to(repo_root)}")
 
     install_url = join_url(args.base_url, "repository.json")
