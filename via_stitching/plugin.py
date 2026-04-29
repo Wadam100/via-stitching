@@ -22,6 +22,7 @@ class ViaStitchingPlugin(pcbnew.ActionPlugin):
             "Constrains to selected zones and respects clearance."
         )
         self.show_toolbar_button = True
+        self.icon_file_name = ""
         icon_path = os.path.join(os.path.dirname(__file__), "icon.png")
         if os.path.isfile(icon_path):
             self.icon_file_name = icon_path
