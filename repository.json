@@ -1,5 +1,6 @@
 {
-  "$schema": "https://go.kicad.org/pcm/schemas/v1",
+  "$schema": "https://go.kicad.org/pcm/schemas/v2",
+  "schema_version": 2,
   "maintainer": {
     "name": "Adam Werner",
     "contact": {
@@ -9,8 +10,8 @@
   "name": "Via Stitching repository",
   "packages": {
     "url": "https://raw.githubusercontent.com/Wadam100/via-stitching/main/packages.json",
-    "sha256": "777611c98c765aa752cfdff63996374ffde5d5c370bbd91194eba40c108fedd5",
-    "update_time_utc": "2026-04-29 17:49:22",
-    "update_timestamp": 1777484962
+    "sha256": "7ead10df311e0d74a113e7e9fb681527db971069d4aae2965dad7d8368620638",
+    "update_time_utc": "2026-04-29 17:58:33",
+    "update_timestamp": 1777485513
   }
 }

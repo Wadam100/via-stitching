@@ -12,6 +12,18 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-04-29T19:30:00Z"
+    },
+    {
+      "id": "bug-002",
+      "timestamp": "2026-04-29T17:58:00Z",
+      "error_message": "KiCad 10 PCM 'Fetching repository' never finishes — dialog hangs with no error message when the user adds the custom repository URL.",
+      "file": "repository.json, packages.json, metadata.json, tools/build_pcm_release.py",
+      "root_cause": "Repository was published using PCM schema v1 ($schema=https://go.kicad.org/pcm/schemas/v1, no schema_version field). KiCad 10 introduced PCM schema v2 and its v2-aware client hangs on the fetch step instead of erroring when it can't validate the repository as v2. Additionally the package versions had `kicad_version_max: \"10.0\"` which the PCM treats as exclusive, hiding the package from KiCad 10 even after the fetch.",
+      "fix": "Bumped both files' `$schema` to https://go.kicad.org/pcm/schemas/v2 and added `\"schema_version\": 2` at the top of repository.json. Removed `kicad_version_max` from metadata.json (plugin works on KiCad 9+ with the stable pcbnew SWIG API), added explicit `\"runtime\": \"swig\"` per the v2 schema. Updated `tools/build_pcm_release.py` to emit v2 artifacts and re-ran it so packages.json/repository.json/zip carry consistent SHA-256s.",
+      "tags": ["kicad", "kicad-10", "pcm", "schema-v2", "fetching-repository", "hang", "kicad_version_max", "runtime", "swig"],
+      "related_bugs": ["bug-001"],
+      "occurrences": 1,
+      "last_seen": "2026-04-29T17:58:00Z"
     }
   ]
 }
