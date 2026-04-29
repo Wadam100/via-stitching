@@ -1,4 +1,17 @@
 {
   "version": 1,
-  "bugs": []
+  "bugs": [
+    {
+      "id": "bug-001",
+      "timestamp": "2026-04-29T19:30:00Z",
+      "error_message": "The given repository URL does not look like a valid KiCad package repository. Please double check the URL.",
+      "file": "repository.json (hosted at raw.githubusercontent.com/Wadam100/via-stitching/main/repository.json)",
+      "root_cause": "GitHub repository Wadam100/via-stitching was private. KiCad PCM fetches repository.json anonymously and cannot send credentials, so raw.githubusercontent.com returned 404 and KiCad reported the URL as invalid. Local git ls-remote worked because it used the user's stored credentials, hiding the visibility issue.",
+      "fix": "Make the GitHub repository public (Settings -> Danger Zone -> Change visibility, or `gh repo edit Wadam100/via-stitching --visibility public --accept-visibility-change-consequences`). Verify with anonymous curl/WebFetch of the raw repository.json URL before retrying in KiCad PCM.",
+      "tags": ["kicad", "pcm", "github", "visibility", "private-repo", "raw.githubusercontent.com"],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-29T19:30:00Z"
+    }
+  ]
 }
