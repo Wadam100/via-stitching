@@ -11,6 +11,7 @@
 ## Key Learnings
 
 - **Project:** via_stitching
+- **KiCad PCM custom repos must be served publicly.** PCM fetches `repository.json` anonymously with no credential support, so a private GitHub repo causes the generic error "The given repository URL does not look like a valid KiCad package repository." Always verify the raw URL with an anonymous fetch (curl / WebFetch / incognito browser) before troubleshooting JSON schema issues — `git ls-remote` succeeds with stored creds and will mislead you.
 
 ## Do-Not-Repeat
 
