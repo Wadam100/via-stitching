@@ -15,12 +15,15 @@
 - **KiCad 10 PCM requires schema v2 — silent hang on v1.** KiCad 10's PCM client expects `repository.json` to declare `"$schema": "https://go.kicad.org/pcm/schemas/v2"` and a top-level `"schema_version": 2`. With a v1 file, KiCad 10 freezes on "Fetching repository" instead of returning an error. The v2 schema also adds an optional `runtime: "swig" | "ipc"` field on each version (default "swig" — set explicitly for SWIG-based action plugins; use "ipc" for the new KiCad 10 IPC API). Build artifacts are produced by `tools/build_pcm_release.py` from `metadata.json` (the source of truth).
 - **`kicad_version_max` excludes the listed version itself.** Setting `kicad_version_max: "10.0"` keeps the package off KiCad 10. If a plugin works on the latest KiCad, omit the field rather than guessing. KiCad's PCM compares versions in a way that treats this bound as exclusive in practice.
 - **PCM schema URLs:** `https://go.kicad.org/pcm/schemas/v1` and `…/v2` both 302-redirect to `gitlab.com/kicad/code/kicad/-/raw/master/kicad/pcm/schemas/pcm.v{1,2}.schema.json`. Use these for ground-truth field requirements.
+- **`ActionPlugin.defaults()` must always set `self.icon_file_name`** — even to `""`. If omitted and KiCad's `register()` accesses the attribute, it raises `AttributeError` and the plugin silently fails to register (disappears from Tools menu). Always set it unconditionally before any conditional override.
+- **KiCad PCM status `"development"` hides the Install button** by default. Users must enable "Show development versions" in PCM preferences. For a publicly usable plugin, always set status to `"stable"` (or `"testing"` for pre-release). After changing status, rebuild with `python3 tools/build_pcm_release.py`.
 
 ## Do-Not-Repeat
 
 <!-- Mistakes made and corrected. Each entry prevents the same mistake recurring. -->
 <!-- Format: [YYYY-MM-DD] Description of what went wrong and what to do instead. -->
 - [2026-04-29] When troubleshooting a KiCad 10 PCM fetch hang, don't waste time on hash mismatches if the local hashes and the served hashes already agree — check the **schema version** first. KiCad 10 hangs (no error) when given a v1 repository.json. Fix is to bump to `$schema` v2 + add `schema_version: 2`.
+- [2026-04-29] Never ship a KiCad PCM package with `"status": "development"` without documenting that the user must enable "Show development versions" in PCM preferences — otherwise the Install button is grayed out/hidden. Use `"stable"` for ready-to-use plugins.
 
 ## Decision Log
 
