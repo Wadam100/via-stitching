@@ -32,7 +32,7 @@ def to_mm(iu: int) -> float:
 class StitchSettings:
     """All user-configurable knobs for one stitching run."""
 
-    PATTERNS = ("grid", "staggered", "perimeter", "tracks")
+    PATTERNS = ("grid", "staggered", "tracks")
 
     def __init__(self) -> None:
         self.pattern: str = "grid"
@@ -80,8 +80,7 @@ class ViaStitcher:
     def resolve_net(self, zone=None):
         if zone is not None:
             return zone.GetNet()
-        # Perimeter pattern: no zone, fall back to GND else net 0.
-        return self.board.FindNet("GND") or self.board.FindNet(0)
+        return self.board.FindNet(0)
 
     def _net_code(self, zone=None) -> int:
         net = self.resolve_net(zone)
@@ -99,8 +98,6 @@ class ViaStitcher:
             n = self._stitch_zones(staggered=False)
         elif p == "staggered":
             n = self._stitch_zones(staggered=True)
-        elif p == "perimeter":
-            n = self._stitch_perimeter()
         elif p == "tracks":
             n = self._stitch_along_tracks()
         else:
@@ -188,46 +185,6 @@ class ViaStitcher:
             y += py
             row += 1
         return count
-
-    # -- perimeter pattern (along Edge.Cuts) -----------------------------
-
-    def _stitch_perimeter(self) -> int:
-        net = self.resolve_net()
-        net_code = net.GetNetCode() if net is not None else 0
-        clearance_iu = mm(self.s.clearance_mm)
-        pitch = mm(self.s.pitch_mm)
-        offset_iu = mm(self.s.edge_clearance_mm)
-        chords = self._collect_edge_chords()
-        cx, cy = self._edge_centroid(chords)
-        count = 0
-        for a, b in chords:
-            ox, oy = self._inward_offset(a, b, cx, cy, offset_iu)
-            count += self._walk_segment(a, b, pitch, net, net_code, clearance_iu, ox, oy)
-        return count
-
-    @staticmethod
-    def _edge_centroid(chords: list) -> tuple:
-        """Return (cx, cy) centroid of all edge chord endpoints — used as board interior reference."""
-        if not chords:
-            return (0, 0)
-        xs = [p.x for a, b in chords for p in (a, b)]
-        ys = [p.y for a, b in chords for p in (a, b)]
-        return (sum(xs) // len(xs), sum(ys) // len(ys))
-
-    @staticmethod
-    def _inward_offset(a, b, cx: int, cy: int, distance_iu: int) -> tuple:
-        """Return (ox, oy) in IU that shifts a point on segment AB inward by distance_iu."""
-        dx = b.x - a.x
-        dy = b.y - a.y
-        length = math.hypot(dx, dy)
-        if length < 1 or distance_iu == 0:
-            return (0, 0)
-        perp1 = (-dy / length,  dx / length)
-        perp2 = ( dy / length, -dx / length)
-        mx = (a.x + b.x) / 2
-        my = (a.y + b.y) / 2
-        inward = perp1 if (perp1[0] * (cx - mx) + perp1[1] * (cy - my)) > 0 else perp2
-        return (int(inward[0] * distance_iu), int(inward[1] * distance_iu))
 
     def _collect_edge_chords(self) -> list:
         """Return [(start, end), ...] approximating Edge.Cuts as straight chords."""
@@ -459,8 +416,8 @@ class ViaStitcher:
                     if d < (foreign_min + pw):
                         return False
 
-        # Board edge clearance (perimeter already offset inward — skip to avoid rejecting its own vias)
-        if self.s.edge_clearance_mm > 0 and self.s.pattern != "perimeter":
+        # Board edge clearance
+        if self.s.edge_clearance_mm > 0:
             edge_iu = mm(self.s.edge_clearance_mm)
             if self._edge_chords_cache is None:
                 self._edge_chords_cache = self._collect_edge_chords()

@@ -15,7 +15,6 @@ _PRESET_FILE = os.path.join(os.path.dirname(__file__), "last_settings.json")
 _PATTERN_LABELS = [
     ("Grid (rectangular)", "grid"),
     ("Staggered / hex", "staggered"),
-    ("Perimeter (along Edge.Cuts)", "perimeter"),
     ("Along selected tracks", "tracks"),
 ]
 
