@@ -35,3 +35,11 @@
 
 | Time | Action | File(s) | Outcome | ~Tokens |
 |------|--------|---------|---------|--------|
+
+## Session: 2026-04-30 18:31
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 18:34 | Edited tools/build_pcm_release.py | inline fix | ~18 |
+| 18:34 | Edited metadata.json | inline fix | ~8 |
+| 18:35 | Fixed PCM zip layout bug — removed extra PLUGIN_PKG_DIR nesting from arc path so files pack as plugins/__init__.py not plugins/via_stitching/__init__.py. Bumped to v0.1.1, rebuilt artifacts. Also patched installed plugin by copying via_stitching/* up to plugin root so it works immediately. | tools/build_pcm_release.py, metadata.json, releases/via_stitching-0.1.1.zip, packages.json, repository.json | Plugin now correctly installs; verified zip layout. | ~8k |

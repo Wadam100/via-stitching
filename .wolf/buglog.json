@@ -51,10 +51,40 @@
       "file": "metadata.json, packages.json, via_stitching/plugin.py",
       "root_cause": "Two combined issues: (1) Package status was 'development' — KiCad PCM hides or grays out the Install button for development packages unless the user explicitly enables 'Show development versions' in PCM preferences, so the user could never click Install. (2) plugin.py defaults() only set self.icon_file_name when icon.png existed on disk; since icon.png is not in the zip, the attribute was never set. On KiCad versions where register() tries to read icon_file_name this raised AttributeError and the plugin silently failed to register, so it never appeared in Tools.",
       "fix": "1. Changed status from 'development' to 'stable' in metadata.json so the Install button is active by default. 2. Added explicit self.icon_file_name = '' before the conditional in plugin.py defaults() so the attribute is always present. 3. Re-ran build_pcm_release.py to regenerate zip, packages.json, and repository.json with updated metadata and plugin code.",
-      "tags": ["kicad", "pcm", "install-button", "status-development", "icon_file_name", "ActionPlugin", "register", "tools-menu"],
-      "related_bugs": ["bug-002"],
+      "tags": [
+        "kicad",
+        "pcm",
+        "install-button",
+        "status-development",
+        "icon_file_name",
+        "ActionPlugin",
+        "register",
+        "tools-menu"
+      ],
+      "related_bugs": [
+        "bug-002"
+      ],
       "occurrences": 1,
       "last_seen": "2026-04-29T18:10:00Z"
+    },
+    {
+      "id": "bug-004",
+      "timestamp": "2026-04-30T16:34:47.307Z",
+      "error_message": "Plugin installed via PCM but does not appear in pcbnew Tools menu",
+      "file": "tools/build_pcm_release.py",
+      "root_cause": "build_pcm_release.py line 117 packed plugin files as `plugins/via_stitching/__init__.py` (with an extra PLUGIN_PKG_DIR nesting). PCM extracted this to com_github_wadam100_via-stitching/via_stitching/ with nothing at the plugin root. KiCad scans each plugin directory for __init__.py at the root — it never found one so the plugin was never registered.",
+      "fix": "Removed PLUGIN_PKG_DIR from the arc path so files pack as plugins/__init__.py (flat). Bumped version to 0.1.1, rebuilt zip + packages.json + repository.json. Also manually copied the 4 py files from the installed via_stitching/ subfolder up to the plugin root so the current install works immediately without a full PCM reinstall.",
+      "tags": [
+        "kicad",
+        "pcm",
+        "tools-menu",
+        "plugin-not-found",
+        "zip-layout",
+        "build-script"
+      ],
+      "related_bugs": ["bug-003"],
+      "occurrences": 1,
+      "last_seen": "2026-04-30T18:35:00Z"
     }
   ]
 }

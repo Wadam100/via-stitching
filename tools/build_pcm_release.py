@@ -114,7 +114,7 @@ def build_plugin_zip(repo_root: Path, metadata: dict, version: str) -> Path:
                 continue
             if path.is_dir():
                 continue
-            arc = Path("plugins") / PLUGIN_PKG_DIR / path.relative_to(src_pkg)
+            arc = Path("plugins") / path.relative_to(src_pkg)
             zf.write(path, arcname=str(arc).replace(os.sep, "/"))
 
     return out_zip
