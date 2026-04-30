@@ -196,10 +196,28 @@ class ViaStitcher:
         net_code = net.GetNetCode() if net is not None else 0
         clearance_iu = mm(self.s.clearance_mm)
         pitch = mm(self.s.pitch_mm)
+        offset_iu = mm(self.s.edge_clearance_mm)
+        center = self.board.GetBoundingBox().GetCenter()
         count = 0
         for a, b in self._collect_edge_chords():
-            count += self._walk_segment(a, b, pitch, net, net_code, clearance_iu)
+            ox, oy = self._inward_offset(a, b, center, offset_iu)
+            count += self._walk_segment(a, b, pitch, net, net_code, clearance_iu, ox, oy)
         return count
+
+    @staticmethod
+    def _inward_offset(a, b, center, distance_iu: int) -> tuple:
+        """Return (ox, oy) in IU that shifts a point on segment AB inward by distance_iu."""
+        dx = b.x - a.x
+        dy = b.y - a.y
+        length = math.hypot(dx, dy)
+        if length < 1 or distance_iu == 0:
+            return (0, 0)
+        perp1 = (-dy / length, dx / length)
+        perp2 = ( dy / length, -dx / length)
+        mx = (a.x + b.x) / 2
+        my = (a.y + b.y) / 2
+        inward = perp1 if (perp1[0] * (center.x - mx) + perp1[1] * (center.y - my)) > 0 else perp2
+        return (int(inward[0] * distance_iu), int(inward[1] * distance_iu))
 
     def _collect_edge_chords(self) -> list:
         """Return [(start, end), ...] approximating Edge.Cuts as straight chords."""
@@ -318,7 +336,7 @@ class ViaStitcher:
 
     # -- shared segment walker -------------------------------------------
 
-    def _walk_segment(self, a, b, pitch_iu, net, net_code, clearance_iu) -> int:
+    def _walk_segment(self, a, b, pitch_iu, net, net_code, clearance_iu, ox=0, oy=0) -> int:
         dx = b.x - a.x
         dy = b.y - a.y
         length = math.hypot(dx, dy)
@@ -329,8 +347,8 @@ class ViaStitcher:
         n_steps = int(length // pitch_iu)
         count = 0
         for i in range(n_steps + 1):
-            x = a.x + ux * pitch_iu * i
-            y = a.y + uy * pitch_iu * i
+            x = a.x + ux * pitch_iu * i + ox
+            y = a.y + uy * pitch_iu * i + oy
             pos = pcbnew.VECTOR2I(int(x), int(y))
             if self._clear_of_obstacles(pos, net_code, clearance_iu):
                 self._add_via(pos, net)
@@ -431,8 +449,8 @@ class ViaStitcher:
                     if d < (foreign_min + pw):
                         return False
 
-        # Board edge clearance (skip for perimeter pattern — vias are intentionally on the edge)
-        if self.s.edge_clearance_mm > 0 and self.s.pattern != "perimeter":
+        # Board edge clearance
+        if self.s.edge_clearance_mm > 0:
             edge_iu = mm(self.s.edge_clearance_mm)
             if self._edge_chords_cache is None:
                 self._edge_chords_cache = self._collect_edge_chords()

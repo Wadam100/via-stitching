@@ -10,8 +10,8 @@
   "name": "Via Stitching repository",
   "packages": {
     "url": "https://raw.githubusercontent.com/Wadam100/via-stitching/main/packages.json",
-    "sha256": "0867c2459fbda781ef326f7af20a0222530b16322bde62c90eb5925e5f5e855c",
-    "update_time_utc": "2026-04-30 17:34:56",
-    "update_timestamp": 1777570496
+    "sha256": "dbfb23004ba740bfcef7c89f052f1f27fa2080f4cbbcd7e379ae373bc219185f",
+    "update_time_utc": "2026-04-30 17:44:24",
+    "update_timestamp": 1777571064
   }
 }
