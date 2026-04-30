@@ -25,7 +25,7 @@ class StitcherDialog(wx.Dialog):
         super().__init__(
             parent,
             title="Via Stitching",
-            size=wx.Size(440, 600),
+            size=wx.Size(400, 460),
             style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER,
         )
         self.board = board
@@ -35,7 +35,7 @@ class StitcherDialog(wx.Dialog):
         self._build_ui(settings)
         self.Layout()
         self.Fit()
-        self.SetMinSize(wx.Size(420, 560))
+        self.SetMinSize(wx.Size(360, 420))
 
     # -- UI construction --------------------------------------------------
 
@@ -52,7 +52,6 @@ class StitcherDialog(wx.Dialog):
             majorDimension=1,
             style=wx.RA_SPECIFY_COLS,
         )
-        # Restore selection
         for i, (_lbl, key) in enumerate(_PATTERN_LABELS):
             if key == s.pattern:
                 self.pattern_choice.SetSelection(i)
@@ -66,65 +65,12 @@ class StitcherDialog(wx.Dialog):
         grid = wx.FlexGridSizer(cols=2, vgap=6, hgap=8)
         grid.AddGrowableCol(1, 1)
 
-        self.pitch_x = self._add_float_row(grid, "Pitch X / along-line", s.pitch_x_mm)
-        self.pitch_y = self._add_float_row(grid, "Pitch Y", s.pitch_y_mm)
+        self.pitch = self._add_float_row(grid, "Pitch", s.pitch_mm)
         self.via_diam = self._add_float_row(grid, "Via diameter", s.via_diameter_mm)
         self.via_drill = self._add_float_row(grid, "Via drill", s.via_drill_mm)
         self.clearance = self._add_float_row(grid, "Clearance to other nets", s.clearance_mm)
-        self.min_spacing = self._add_float_row(
-            grid, "Min via-to-via spacing", s.min_via_spacing_mm
-        )
         geo.Add(grid, 0, wx.EXPAND | wx.ALL, pad)
         outer.Add(geo, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, pad)
-
-        # --- Net + layers ---
-        net_box = wx.StaticBox(self, label="Net + layers")
-        net_sizer = wx.StaticBoxSizer(net_box, wx.VERTICAL)
-
-        self.use_zone_net = wx.CheckBox(
-            self, label="Use net of selected zone(s) / track(s)"
-        )
-        self.use_zone_net.SetValue(s.use_zone_net)
-        net_sizer.Add(self.use_zone_net, 0, wx.ALL, pad)
-
-        net_grid = wx.FlexGridSizer(cols=2, vgap=6, hgap=8)
-        net_grid.AddGrowableCol(1, 1)
-
-        net_grid.Add(
-            wx.StaticText(self, label="Fallback net:"),
-            0,
-            wx.ALIGN_CENTER_VERTICAL,
-        )
-        self.net_combo = wx.ComboBox(
-            self,
-            value=s.net_name,
-            choices=self._board_net_names(),
-            style=wx.CB_DROPDOWN,
-        )
-        net_grid.Add(self.net_combo, 1, wx.EXPAND)
-
-        layer_choices, layer_ids = self._copper_layer_choices()
-        net_grid.Add(
-            wx.StaticText(self, label="Top layer:"),
-            0,
-            wx.ALIGN_CENTER_VERTICAL,
-        )
-        self.layer_top = wx.Choice(self, choices=layer_choices)
-        self._select_layer(self.layer_top, layer_ids, s.layer_top)
-        net_grid.Add(self.layer_top, 1, wx.EXPAND)
-
-        net_grid.Add(
-            wx.StaticText(self, label="Bottom layer:"),
-            0,
-            wx.ALIGN_CENTER_VERTICAL,
-        )
-        self.layer_bottom = wx.Choice(self, choices=layer_choices)
-        self._select_layer(self.layer_bottom, layer_ids, s.layer_bottom)
-        net_grid.Add(self.layer_bottom, 1, wx.EXPAND)
-
-        self._layer_ids = layer_ids
-        net_sizer.Add(net_grid, 0, wx.EXPAND | wx.ALL, pad)
-        outer.Add(net_sizer, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, pad)
 
         # --- Action buttons ---
         btns = wx.BoxSizer(wx.HORIZONTAL)
@@ -158,49 +104,6 @@ class StitcherDialog(wx.Dialog):
         grid.Add(ctrl, 1, wx.EXPAND)
         return ctrl
 
-    # -- board introspection ---------------------------------------------
-
-    def _board_net_names(self) -> list[str]:
-        nets = self.board.GetNetsByName()
-        names = []
-        # GetNetsByName returns a wxString-keyed map; iterate keys
-        try:
-            for name in nets.keys():
-                s = str(name)
-                if s and s != "":
-                    names.append(s)
-        except Exception:
-            for net in self.board.GetNetInfo().NetsByNetcode().values():
-                names.append(net.GetNetname())
-        names = sorted(set(names))
-        # Make sure "GND" is first if present, else just leave alphabetical.
-        if "GND" in names:
-            names.remove("GND")
-            names.insert(0, "GND")
-        return names
-
-    def _copper_layer_choices(self):
-        names = []
-        ids = []
-        for layer_id in range(pcbnew.PCB_LAYER_ID_COUNT):
-            if not pcbnew.IsCopperLayer(layer_id):
-                continue
-            try:
-                name = self.board.GetLayerName(layer_id)
-            except Exception:
-                name = pcbnew.LayerName(layer_id)
-            names.append(name)
-            ids.append(layer_id)
-        return names, ids
-
-    @staticmethod
-    def _select_layer(choice_ctrl: wx.Choice, ids: list, target_id: int) -> None:
-        try:
-            idx = ids.index(target_id)
-        except ValueError:
-            idx = 0
-        choice_ctrl.SetSelection(idx)
-
     # -- presets ----------------------------------------------------------
 
     def _load_preset(self) -> StitchSettings:
@@ -229,16 +132,10 @@ class StitcherDialog(wx.Dialog):
     def _collect_settings(self) -> StitchSettings:
         s = StitchSettings()
         s.pattern = _PATTERN_LABELS[self.pattern_choice.GetSelection()][1]
-        s.pitch_x_mm = self._float(self.pitch_x, 2.54)
-        s.pitch_y_mm = self._float(self.pitch_y, 2.54)
+        s.pitch_mm = self._float(self.pitch, 2.54)
         s.via_diameter_mm = self._float(self.via_diam, 0.6)
         s.via_drill_mm = self._float(self.via_drill, 0.3)
         s.clearance_mm = self._float(self.clearance, 0.25)
-        s.min_via_spacing_mm = self._float(self.min_spacing, 0.5)
-        s.use_zone_net = self.use_zone_net.GetValue()
-        s.net_name = self.net_combo.GetValue().strip() or "GND"
-        s.layer_top = self._layer_ids[self.layer_top.GetSelection()]
-        s.layer_bottom = self._layer_ids[self.layer_bottom.GetSelection()]
         return s
 
     @staticmethod
@@ -252,14 +149,6 @@ class StitcherDialog(wx.Dialog):
 
     def on_apply(self, _event) -> None:
         s = self._collect_settings()
-        if s.layer_top == s.layer_bottom:
-            wx.MessageBox(
-                "Top and bottom layers must differ for a through-via.",
-                "Via Stitching",
-                wx.OK | wx.ICON_WARNING,
-            )
-            return
-
         self._save_preset(s)
         self.status.SetLabel("Stitching...")
         wx.SafeYield()
@@ -282,7 +171,6 @@ class StitcherDialog(wx.Dialog):
             self.status.SetLabel(f"Error: {e}")
             return
 
-        # Update connectivity + redraw
         try:
             self.board.BuildConnectivity()
         except Exception:

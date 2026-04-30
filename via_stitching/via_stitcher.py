@@ -36,18 +36,10 @@ class StitchSettings:
 
     def __init__(self) -> None:
         self.pattern: str = "grid"
-        self.pitch_x_mm: float = 2.54
-        self.pitch_y_mm: float = 2.54
+        self.pitch_mm: float = 2.54
         self.via_diameter_mm: float = 0.6
         self.via_drill_mm: float = 0.3
         self.clearance_mm: float = 0.25
-        self.net_name: str = "GND"
-        self.use_zone_net: bool = True
-        self.layer_top: int = pcbnew.F_Cu
-        self.layer_bottom: int = pcbnew.B_Cu
-        # Minimum centre-to-centre distance between any two stitch vias and
-        # between a stitch via and an existing same-net via.
-        self.min_via_spacing_mm: float = 0.5
         self.dry_run: bool = False
 
 
@@ -83,13 +75,10 @@ class ViaStitcher:
     # -- net resolution ---------------------------------------------------
 
     def resolve_net(self, zone=None):
-        if self.s.use_zone_net and zone is not None:
+        if zone is not None:
             return zone.GetNet()
-        net = self.board.FindNet(self.s.net_name)
-        if net is None:
-            # Fall back to net code 0 if name not found
-            net = self.board.FindNet(0)
-        return net
+        # Perimeter pattern: no zone, fall back to GND else net 0.
+        return self.board.FindNet("GND") or self.board.FindNet(0)
 
     def _net_code(self, zone=None) -> int:
         net = self.resolve_net(zone)
@@ -173,8 +162,8 @@ class ViaStitcher:
         bbox = zone.GetBoundingBox()
         x0, y0 = bbox.GetLeft(), bbox.GetTop()
         x1, y1 = bbox.GetRight(), bbox.GetBottom()
-        px = mm(self.s.pitch_x_mm)
-        py = mm(self.s.pitch_y_mm)
+        px = mm(self.s.pitch_mm)
+        py = mm(self.s.pitch_mm)
         if staggered:
             # Hex packing: row spacing = py * sqrt(3)/2
             py = int(py * math.sqrt(3) / 2)
@@ -204,7 +193,7 @@ class ViaStitcher:
         net = self.resolve_net()
         net_code = net.GetNetCode() if net is not None else 0
         clearance_iu = mm(self.s.clearance_mm)
-        pitch = mm(self.s.pitch_x_mm)
+        pitch = mm(self.s.pitch_mm)
         count = 0
         for a, b in self._collect_edge_chords():
             count += self._walk_segment(a, b, pitch, net, net_code, clearance_iu)
@@ -315,15 +304,10 @@ class ViaStitcher:
                 "before running the 'along selected tracks' pattern."
             )
         clearance_iu = mm(self.s.clearance_mm)
-        pitch = mm(self.s.pitch_x_mm)
+        pitch = mm(self.s.pitch_mm)
         count = 0
         for tr in tracks:
-            # If the user opted in to use_zone_net but didn't select a zone,
-            # fall back to the track's net.
-            if self.s.use_zone_net:
-                net = tr.GetNet()
-            else:
-                net = self.resolve_net()
+            net = tr.GetNet()
             net_code = net.GetNetCode() if net is not None else 0
             count += self._walk_segment(
                 tr.GetStart(), tr.GetEnd(), pitch, net, net_code, clearance_iu
@@ -361,7 +345,7 @@ class ViaStitcher:
         try:
             layers = zone.GetLayerSet().Seq()
         except Exception:
-            layers = [self.s.layer_top]
+            layers = [pcbnew.F_Cu]
         for layer in layers:
             try:
                 polys = zone.GetFilledPolysList(layer)
@@ -401,7 +385,8 @@ class ViaStitcher:
     def _clear_of_obstacles(self, pos, my_net_code: int, clearance_iu: int) -> bool:
         via_r = mm(self.s.via_diameter_mm) // 2
         foreign_min = via_r + clearance_iu
-        spacing_iu = mm(self.s.min_via_spacing_mm)
+        # Min centre-to-centre between any two vias = via diameter + clearance.
+        spacing_iu = via_r * 2 + clearance_iu
 
         # Self-collision against newly placed vias (any net)
         for (px, py) in self._placed_positions:
@@ -457,7 +442,7 @@ class ViaStitcher:
         via.SetWidth(mm(self.s.via_diameter_mm))
         via.SetDrill(mm(self.s.via_drill_mm))
         via.SetViaType(pcbnew.VIATYPE_THROUGH)
-        via.SetLayerPair(self.s.layer_top, self.s.layer_bottom)
+        via.SetLayerPair(pcbnew.F_Cu, pcbnew.B_Cu)
         if net is not None:
             via.SetNet(net)
         self.board.Add(via)
