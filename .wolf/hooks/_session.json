@@ -1,73 +1,32 @@
 {
-  "session_id": "session-2026-04-29-1804",
-  "started": "2026-04-29T18:04:53.143Z",
+  "session_id": "session-2026-04-30-0441",
+  "started": "2026-04-30T04:41:07.821Z",
   "files_read": {
-    "/home/user/via-stitching/plugin.py": {
-      "count": 1,
-      "tokens": 0,
-      "first_read": "2026-04-29T18:05:01.376Z"
-    },
-    "/home/user/via-stitching/via_stitching/__init__.py": {
-      "count": 1,
-      "tokens": 51,
-      "first_read": "2026-04-29T18:05:09.582Z"
-    },
-    "/home/user/via-stitching/via_stitching/plugin.py": {
-      "count": 1,
-      "tokens": 553,
-      "first_read": "2026-04-29T18:05:09.623Z"
-    },
-    "/home/user/via-stitching/metadata.json": {
-      "count": 1,
-      "tokens": 332,
-      "first_read": "2026-04-29T18:05:15.571Z"
-    },
     "/home/user/via-stitching/packages.json": {
       "count": 1,
       "tokens": 330,
-      "first_read": "2026-04-29T18:05:33.616Z"
+      "first_read": "2026-04-30T04:41:16.741Z"
     },
-    "/home/user/via-stitching/via_stitching/stitcher_dialog.py": {
+    "/home/user/via-stitching/repository.json": {
       "count": 1,
-      "tokens": 0,
-      "first_read": "2026-04-29T18:05:33.982Z"
-    },
-    "/home/user/via-stitching/via_stitching/via_stitcher.py": {
-      "count": 1,
-      "tokens": 0,
-      "first_read": "2026-04-29T18:05:48.437Z"
+      "tokens": 120,
+      "first_read": "2026-04-30T04:41:29.551Z"
     },
     "/home/user/via-stitching/tools/build_pcm_release.py": {
       "count": 1,
       "tokens": 2501,
-      "first_read": "2026-04-29T18:07:39.925Z"
+      "first_read": "2026-04-30T04:41:36.962Z"
     },
-    "/home/user/via-stitching/README.md": {
+    "/home/user/via-stitching/metadata.json": {
       "count": 1,
-      "tokens": 0,
-      "first_read": "2026-04-29T18:08:29.121Z"
+      "tokens": 330,
+      "first_read": "2026-04-30T04:42:05.136Z"
     }
   },
-  "files_written": [
-    {
-      "file": "/home/user/via-stitching/metadata.json",
-      "action": "edit",
-      "tokens": 8,
-      "at": "2026-04-29T18:10:22.843Z"
-    },
-    {
-      "file": "/home/user/via-stitching/via_stitching/plugin.py",
-      "action": "edit",
-      "tokens": 65,
-      "at": "2026-04-29T18:10:33.139Z"
-    }
-  ],
-  "edit_counts": {
-    "metadata.json": 1,
-    "via_stitching/plugin.py": 1
-  },
-  "anatomy_hits": 6,
-  "anatomy_misses": 3,
+  "files_written": [],
+  "edit_counts": {},
+  "anatomy_hits": 4,
+  "anatomy_misses": 0,
   "repeated_reads_warned": 0,
   "cerebrum_warnings": 0,
   "stop_count": 1
