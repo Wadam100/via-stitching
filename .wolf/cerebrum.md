@@ -6,7 +6,7 @@
 
 ## User Preferences
 
-<!-- How the user likes things done. Code style, tools, patterns, communication. -->
+- **Always bump the version and rebuild PCM artifacts on every push.** Skipping this left PCM showing no update, which caused confusion. After every code change: bump `metadata.json` version, run `python tools/build_pcm_release.py`, include packages.json / repository.json / zip in the commit.
 
 ## Key Learnings
 
@@ -24,6 +24,7 @@
 <!-- Format: [YYYY-MM-DD] Description of what went wrong and what to do instead. -->
 - [2026-04-29] When troubleshooting a KiCad 10 PCM fetch hang, don't waste time on hash mismatches if the local hashes and the served hashes already agree — check the **schema version** first. KiCad 10 hangs (no error) when given a v1 repository.json. Fix is to bump to `$schema` v2 + add `schema_version: 2`.
 - [2026-04-29] Never ship a KiCad PCM package with `"status": "development"` without documenting that the user must enable "Show development versions" in PCM preferences — otherwise the Install button is grayed out/hidden. Use `"stable"` for ready-to-use plugins.
+- [2026-04-30] When removing a field from `StitchSettings`, grep every method in `via_stitcher.py` for references to that field — `_group_name()`, `_group_name()` etc. can silently fail inside `try/except` blocks and take down an unrelated feature (grouping) with no visible error. Always search the whole file before committing a settings removal.
 - [2026-04-30] The PCM zip must pack Python files **flat** under `plugins/` (i.e., `plugins/__init__.py`). Do NOT add an extra package subdirectory (`plugins/via_stitching/__init__.py`). PCM extracts `plugins/` directly into the plugin identifier directory; any subdirectory nesting means nothing lands at the root, so KiCad never finds the plugin's `__init__.py` and it silently stays out of the Tools menu. In `build_pcm_release.py` the arc path must be `Path("plugins") / path.relative_to(src_pkg)` — not `Path("plugins") / PLUGIN_PKG_DIR / path.relative_to(src_pkg)`.
 
 ## Decision Log
