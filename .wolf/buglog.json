@@ -82,9 +82,127 @@
         "zip-layout",
         "build-script"
       ],
-      "related_bugs": ["bug-003"],
+      "related_bugs": [
+        "bug-003"
+      ],
       "occurrences": 1,
       "last_seen": "2026-04-30T18:35:00Z"
+    },
+    {
+      "id": "bug-005",
+      "timestamp": "2026-04-30T16:42:29.579Z",
+      "error_message": "Significant refactor of ",
+      "file": "via_stitching/via_stitcher.py",
+      "root_cause": "6 lines replaced/restructured",
+      "fix": "Rewrote 15→10 lines (6 removed) | Also: pitch = mm(self.s.pitch_x_mm); # If the user opted in to use_zone_net but didn't ",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-04-30T16:43:02.946Z"
+    },
+    {
+      "id": "bug-006",
+      "timestamp": "2026-04-30T16:42:48.257Z",
+      "error_message": "Wrong reference: pitch_x_mm should be pitch_mm",
+      "file": "via_stitching/via_stitcher.py",
+      "root_cause": "Used \"pitch_x_mm\" instead of \"pitch_mm\"",
+      "fix": "Changed pitch_x_mm → pitch_mm",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-30T16:42:48.257Z"
+    },
+    {
+      "id": "bug-007",
+      "timestamp": "2026-04-30T16:44:26.901Z",
+      "error_message": "Incorrect value in code",
+      "file": "metadata.json",
+      "root_cause": "Had \"0.1.1\"",
+      "fix": "Changed to \"0.1.2\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "json"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-30T16:44:26.901Z"
+    },
+    {
+      "id": "bug-008",
+      "timestamp": "2026-04-30T16:55:26.812Z",
+      "error_message": "Via grouping no longer works after refactor — vias are placed individually, not in a PCB_GROUP",
+      "file": "via_stitching/via_stitcher.py",
+      "root_cause": "_group_name() still referenced self.s.net_name and self.s.use_zone_net which were removed in the UI simplification refactor. AttributeError was silently swallowed by the try/except in _make_group(), which then returned None. With self._group = None, all runs skipped grouping entirely.",
+      "fix": "Simplified _group_name() to return just f'Stitching: {pattern_label}' — removing the net_part that depended on the deleted attributes.",
+      "tags": [
+        "kicad",
+        "grouping",
+        "PCB_GROUP",
+        "stale-attribute-reference",
+        "silent-exception"
+      ],
+      "related_bugs": [
+        "bug-005"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-04-30T16:55:26.812Z"
+    },
+    {
+      "id": "bug-009",
+      "timestamp": "2026-04-30T16:55:35.233Z",
+      "error_message": "Incorrect value in code",
+      "file": "metadata.json",
+      "root_cause": "Had \"0.1.2\"",
+      "fix": "Changed to \"0.1.3\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "json"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-30T16:55:35.233Z"
+    },
+    {
+      "id": "bug-010",
+      "timestamp": "2026-04-30T17:08:05.005Z",
+      "error_message": "Incorrect value in code",
+      "file": "metadata.json",
+      "root_cause": "Had \"0.1.3\"",
+      "fix": "Changed to \"0.1.4\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "json"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-30T17:08:05.005Z"
+    },
+    {
+      "id": "bug-011",
+      "timestamp": "2026-04-30T17:34:50.775Z",
+      "error_message": "Incorrect value in code",
+      "file": "metadata.json",
+      "root_cause": "Had \"0.1.4\"",
+      "fix": "Changed to \"0.1.5\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "json"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-30T17:34:50.775Z"
     }
   ]
 }
