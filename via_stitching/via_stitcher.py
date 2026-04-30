@@ -136,8 +136,7 @@ class ViaStitcher:
             "perimeter": "Perimeter",
             "tracks": "Tracks",
         }.get(self.s.pattern, self.s.pattern)
-        net_part = self.s.net_name if not self.s.use_zone_net else "auto-net"
-        return f"Stitching: {pattern_label} ({net_part})"
+        return f"Stitching: {pattern_label}"
 
     # -- area patterns (grid + staggered) --------------------------------
 
