@@ -20,14 +20,14 @@
       },
       "versions": [
         {
-          "version": "0.1.6",
+          "version": "0.1.7",
           "status": "stable",
           "kicad_version": "9.0",
           "runtime": "swig",
-          "download_url": "https://raw.githubusercontent.com/Wadam100/via-stitching/main/releases/via_stitching-0.1.6.zip",
-          "download_sha256": "18a774aa8c0dabfbbb2c7e24b20760322552e061e8c3705e18a20831f47b6724",
-          "download_size": 9340,
-          "install_size": 30088
+          "download_url": "https://raw.githubusercontent.com/Wadam100/via-stitching/main/releases/via_stitching-0.1.7.zip",
+          "download_sha256": "a80d6169c6c96f0a9eed499a9702d12d6debce59c28866971dceeec30d5d3cac",
+          "download_size": 9387,
+          "install_size": 30197
         }
       ],
       "tags": [
