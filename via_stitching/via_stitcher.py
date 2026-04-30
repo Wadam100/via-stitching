@@ -197,26 +197,36 @@ class ViaStitcher:
         clearance_iu = mm(self.s.clearance_mm)
         pitch = mm(self.s.pitch_mm)
         offset_iu = mm(self.s.edge_clearance_mm)
-        center = self.board.GetBoundingBox().GetCenter()
+        chords = self._collect_edge_chords()
+        cx, cy = self._edge_centroid(chords)
         count = 0
-        for a, b in self._collect_edge_chords():
-            ox, oy = self._inward_offset(a, b, center, offset_iu)
+        for a, b in chords:
+            ox, oy = self._inward_offset(a, b, cx, cy, offset_iu)
             count += self._walk_segment(a, b, pitch, net, net_code, clearance_iu, ox, oy)
         return count
 
     @staticmethod
-    def _inward_offset(a, b, center, distance_iu: int) -> tuple:
+    def _edge_centroid(chords: list) -> tuple:
+        """Return (cx, cy) centroid of all edge chord endpoints — used as board interior reference."""
+        if not chords:
+            return (0, 0)
+        xs = [p.x for a, b in chords for p in (a, b)]
+        ys = [p.y for a, b in chords for p in (a, b)]
+        return (sum(xs) // len(xs), sum(ys) // len(ys))
+
+    @staticmethod
+    def _inward_offset(a, b, cx: int, cy: int, distance_iu: int) -> tuple:
         """Return (ox, oy) in IU that shifts a point on segment AB inward by distance_iu."""
         dx = b.x - a.x
         dy = b.y - a.y
         length = math.hypot(dx, dy)
         if length < 1 or distance_iu == 0:
             return (0, 0)
-        perp1 = (-dy / length, dx / length)
+        perp1 = (-dy / length,  dx / length)
         perp2 = ( dy / length, -dx / length)
         mx = (a.x + b.x) / 2
         my = (a.y + b.y) / 2
-        inward = perp1 if (perp1[0] * (center.x - mx) + perp1[1] * (center.y - my)) > 0 else perp2
+        inward = perp1 if (perp1[0] * (cx - mx) + perp1[1] * (cy - my)) > 0 else perp2
         return (int(inward[0] * distance_iu), int(inward[1] * distance_iu))
 
     def _collect_edge_chords(self) -> list:
