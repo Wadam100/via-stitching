@@ -69,6 +69,7 @@ class StitcherDialog(wx.Dialog):
         self.via_diam = self._add_float_row(grid, "Via diameter", s.via_diameter_mm)
         self.via_drill = self._add_float_row(grid, "Via drill", s.via_drill_mm)
         self.clearance = self._add_float_row(grid, "Clearance to other nets", s.clearance_mm)
+        self.edge_clearance = self._add_float_row(grid, "Board edge clearance", s.edge_clearance_mm)
         geo.Add(grid, 0, wx.EXPAND | wx.ALL, pad)
         outer.Add(geo, 0, wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, pad)
 
@@ -136,6 +137,7 @@ class StitcherDialog(wx.Dialog):
         s.via_diameter_mm = self._float(self.via_diam, 0.6)
         s.via_drill_mm = self._float(self.via_drill, 0.3)
         s.clearance_mm = self._float(self.clearance, 0.25)
+        s.edge_clearance_mm = self._float(self.edge_clearance, 0.5)
         return s
 
     @staticmethod

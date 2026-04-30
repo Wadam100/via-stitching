@@ -40,6 +40,7 @@ class StitchSettings:
         self.via_diameter_mm: float = 0.6
         self.via_drill_mm: float = 0.3
         self.clearance_mm: float = 0.25
+        self.edge_clearance_mm: float = 0.5
         self.dry_run: bool = False
 
 
@@ -54,6 +55,8 @@ class ViaStitcher:
         self.added: list = []
         # Cache of newly placed positions for fast self-collision checks.
         self._placed_positions: list[tuple[int, int]] = []
+        # Lazily populated on first clearance check; reused for the whole run.
+        self._edge_chords_cache: list | None = None
         # PCB_GROUP that all vias placed in this run get added to.
         self._group = None
 
@@ -427,6 +430,16 @@ class ViaStitcher:
                 else:
                     if d < (foreign_min + pw):
                         return False
+
+        # Board edge clearance
+        if self.s.edge_clearance_mm > 0:
+            edge_iu = mm(self.s.edge_clearance_mm)
+            if self._edge_chords_cache is None:
+                self._edge_chords_cache = self._collect_edge_chords()
+            for a, b in self._edge_chords_cache:
+                if self._point_to_seg_dist(pos, a, b) < edge_iu:
+                    return False
+
         return True
 
     # -- mutation --------------------------------------------------------
