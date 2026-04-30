@@ -431,8 +431,8 @@ class ViaStitcher:
                     if d < (foreign_min + pw):
                         return False
 
-        # Board edge clearance
-        if self.s.edge_clearance_mm > 0:
+        # Board edge clearance (skip for perimeter pattern — vias are intentionally on the edge)
+        if self.s.edge_clearance_mm > 0 and self.s.pattern != "perimeter":
             edge_iu = mm(self.s.edge_clearance_mm)
             if self._edge_chords_cache is None:
                 self._edge_chords_cache = self._collect_edge_chords()
